@@ -1,17 +1,13 @@
-FROM node:12.17.0-alpine as node
+FROM nginx:alpine
 
-WORKDIR /root
+COPY ./ /root/client
 
-COPY ./ /root
-RUN apk update && apk add bash && apk add curl
-RUN npm install -g @angular/cli
+WORKDIR /root/client
+
+RUN ls
+RUN apk update && apk add --update nodejs && apk add --update npm
 RUN npm install
+RUN npm install -g @angular/cli
 RUN ng version
-ENTRYPOINT ng serve --host 0.0.0.0
-# Stage 2
-# FROM nginx:1.13.12-alpine
-
-
-# COPY --from=node /usr/src/app/dist/client /usr/share/nginx/html
-
-# COPY ./nginx.conf /etc/nginx/conf.d/default.conf
+RUN ng build --output-path=/usr/share/nginx/html
+CMD ["./start.sh"]
